@@ -1,259 +1,231 @@
 <!-- 嵌入式股東會紀念品小遊戲開始 -->
-<div id="quiz-widget-container">
-  <style>
-    /* 嵌入式小遊戲樣式 */
-    #quiz-widget-container {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 700px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    #quiz-widget-container h1,
-    #quiz-widget-container h2 {
-      text-align: center;
-    }
-    #quiz-widget-container .progress-bar {
-      width: 100%;
-      background: #eee;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    #quiz-widget-container .progress {
-      height: 10px;
-      background: #4CAF50;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-    #quiz-widget-container .question,
-    #quiz-widget-container .result,
-    #quiz-widget-container .intro {
-      display: none;
-    }
-    #quiz-widget-container .active {
-      display: block;
-    }
-    #quiz-widget-container .options {
-      list-style: none;
-      padding: 0;
-    }
-    #quiz-widget-container .options li {
-      margin: 10px 0;
-    }
-    #quiz-widget-container .options button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background: #fff;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    #quiz-widget-container .options button:hover {
-      background: #f0f0f0;
-    }
-    #quiz-widget-container .btn {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background: #4CAF50;
-      color: #fff;
-      transition: background 0.2s;
-    }
-    #quiz-widget-container .btn:hover {
-      background: #45a049;
-    }
-    #quiz-widget-container .result-content {
-      line-height: 1.6;
-    }
-  </style>
-
-  <!-- 進度條 -->
-  <div class="progress-bar">
-    <div class="progress" id="progress"></div>
-  </div>
-
-  <!-- 介紹頁面 -->
-  <div id="intro" class="intro active">
-    <h1>哪種股東會紀念品可能最吸引你？</h1>
-    <p>
-      又到了股東會紀念品發放的季節，每到這個時候，有創意的股東會紀念品總是迎來矚目。<br>
-      在眾多公司之中，又是哪一種股東會紀念品最吸引你呢？
-    </p>
-    <button class="btn" id="startBtn">開始測試</button>
-  </div>
-
-  <!-- 第一題 -->
-  <div id="question1" class="question">
-    <h2>第一個問題</h2>
-    <p>如果可以領到股東會紀念品，你比較喜歡哪個類型呢？</p>
-    <ul class="options">
-      <li><button data-value="1">1. 禮品卡或禮券比較好，有面額的看了比較開心</button></li>
-      <li><button data-value="2">2. 比較喜歡猜不到的，看公司今年有什麼創意</button></li>
-      <li><button data-value="3">3. 我重視健康，覺得清潔用品或是保健食品很不錯</button></li>
-      <li><button data-value="4">4. 什麼股東會紀念品？把公司經營好比較重要啦</button></li>
-    </ul>
-  </div>
-
-  <!-- 分支題（僅當選擇第二選項時顯示） -->
-  <div id="question2" class="question">
-    <h2>第二個問題</h2>
-    <p>
-      有些公司不發最簡單的禮券，而是絞盡腦汁地挑選每年的股東會紀念品。<br>
-      不過，在這些與眾不同的紀念品中，也可以歸納出一些類型。哪一種你比較有興趣呢？
-    </p>
-    <ul class="options">
-      <li><button data-value="5">5. 有沒有可以吃或喝的紀念品？</button></li>
-      <li><button data-value="6">6. 如果可以拿來裝東西也不錯？</button></li>
-      <li><button data-value="7">7. 我喜歡聯名商品！有這樣的紀念品嗎？</button></li>
-      <li><button data-value="8">8. 我就愛完全猜不到的紀念，有沒有這種的？</button></li>
-    </ul>
-  </div>
-
-  <!-- 結果頁面 -->
-  <div id="result" class="result">
-    <h2 id="resultTitle"></h2>
-    <div class="result-content" id="resultContent"></div>
-    <button class="btn" id="restartBtn">重新測試</button>
-  </div>
-
-  <script>
-    (function() {
-      // 用來追蹤目前步驟 (0: intro, 1: question1, 2: question2, 3: result)
-      let currentStep = 0;
-      const progress = document.getElementById('progress');
-
-      // 結果資料
-      const results = {
-        1: {
-          title: '有面額的看起來比較開心 型',
-          content: `你比較喜歡自己選擇想買什麼商品，所以禮品卡的類型深得你心。<br><br>
-                    代表公司：大部分的公司、王品（2727）、大魯閣（1432）<br>
-                    王品2024年就曾發放價值3,000元的「王品股東大禮包」，內含王品門市現金抵用券、王品豐美食APP、購物網抵用券，以及點數。<br>
-                    大魯閣的禮券也常物超所值，2025年便發800元消費抵用券，和8張玩樂買一送一勸，總價值超過4,000元，且零股就能領。`
-        },
-        2: {
-          title: '健康乾淨比較好 型',
-          content: `比起創意、禮券，你更希望股東會紀念品也能讓你健康、乾淨。<br><br>
-                    代表公司：佳世達（2352）<br>
-                    佳世達贈送的紀念品與健康相關，但在商品品項的選擇上也讓人眼睛一亮。<br>
-                    2024年，佳世達贈送「幸福物語蒸氣眼罩(迪士尼系列-米奇)」，2025年，佳世達則選擇「乖乖發財巾88抽」，寓意發財的祝福與創意兼具。`
-        },
-        3: {
-          title: '公司經營才是最重要的 型',
-          content: `你重視公司經營，認為股東會紀念品相對沒這麼重要。<br><br>
-                    代表公司：台積電（2330）<br>
-                    台積電早年有發放紀念品，但近年來因成本、文化及法規等考量已逐漸停止發放。<br>
-                    要發放紀念品對於擁有逾157萬股東的台積電而言，費用是一大考量。`
-        },
-        5: {
-          title: '能填飽肚子比較好 型',
-          content: `如果紀念品可以成為熱量就好了！的確，有些紀念品可能用不到，但吃的一定會吃掉。<br><br>
-                    代表公司：群創（3481）<br>
-                    群創2025年發放的紀念品是「台灣產製真空包裝白米1公斤」，另一家面板廠友達也在今年發放600公克的白米紀念品。`
-        },
-        6: {
-          title: '給我一個容器 我可以裝下全世界 型',
-          content: `以重視實用性而言，許多公司選擇發放杯子、碗、提袋等作為紀念品。<br><br>
-                    代表公司：中碳（1723）<br>
-                    中碳2025年的紀念品是「康寧耐熱玻璃烤盤」，外型典雅穩重，且由美國康寧出品，讓投資人感受到滿滿用心。`
-        },
-        7: {
-          title: '就愛聯名商品 型',
-          content: `部分公司會藉由聯名的方式，讓紀念品更具話題性與特色。<br><br>
-                    代表公司：聯電（2303）<br>
-                    聯電近年選擇與知名 IP 合作，推出「咖波永續隨行杯」及「UMCx咖波聯名限定鋼珠筆套組」，深受粉絲喜愛。`
-        },
-        8: {
-          title: '給我更多創意 型',
-          content: `也有公司以出奇制勝的方式，讓紀念品充滿驚喜與創意。<br><br>
-                    代表公司：中鋼（2002）、宏達電（2498）<br>
-                    中鋼曾推出「熊愛台灣棘輪起子工具組」及「砧心有您」抗菌多功能不鏽鋼砧板組；宏達電則有過送出 HTC One 32G、背包與風衣等紀念品的紀錄。`
-        }
-      };
-
-      // 取得 DOM 元素
-      const introEl = document.getElementById('intro');
-      const question1El = document.getElementById('question1');
-      const question2El = document.getElementById('question2');
-      const resultEl = document.getElementById('result');
-      const resultTitleEl = document.getElementById('resultTitle');
-      const resultContentEl = document.getElementById('resultContent');
-      const startBtn = document.getElementById('startBtn');
-      const restartBtn = document.getElementById('restartBtn');
-
-      // 更新進度條 (總共 4 步驟：0~3)
-      function updateProgress(step) {
-        const percent = (step / 3) * 100;
-        progress.style.width = percent + '%';
+<div id="quiz-widget-container"></div>
+<script>
+(function() {
+  var container = document.getElementById('quiz-widget-container');
+  container.innerHTML = `
+    <style>
+      /* 小遊戲樣式 */
+      #quiz-widget-container {
+        font-family: Arial, sans-serif;
+        background: #f9f9f9;
+        padding: 20px;
+        max-width: 700px;
+        margin: 20px auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       }
-
-      // 顯示指定區塊並隱藏其他區塊
-      function showSection(section) {
-        introEl.classList.remove('active');
-        question1El.classList.remove('active');
-        question2El.classList.remove('active');
-        resultEl.classList.remove('active');
-        section.classList.add('active');
+      .progress-bar {
+        width: 100%;
+        background: #eee;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        overflow: hidden;
       }
-
-      // 開始測試
-      startBtn.addEventListener('click', () => {
-        currentStep = 1;
+      .progress {
+        height: 10px;
+        background: #4CAF50;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+      .page { display: none; }
+      .page.active { display: block; }
+      .options { list-style: none; padding: 0; }
+      .options li { margin: 10px 0; }
+      .options button {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .options button:hover { background: #f0f0f0; }
+      .btn {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background: #4CAF50;
+        color: #fff;
+        transition: background 0.2s;
+      }
+      .btn:hover { background: #45a049; }
+      .result-content { line-height: 1.6; }
+    </style>
+    
+    <!-- 進度條 -->
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+    
+    <!-- 介紹頁面 -->
+    <div id="intro" class="page active">
+      <h1>哪種股東會紀念品可能最吸引你？</h1>
+      <p>
+        又到了股東會紀念品發放的季節，每到這個時候，有創意的股東會紀念品總是迎來矚目。<br>
+        在眾多公司之中，又是哪一種股東會紀念品最吸引你呢？
+      </p>
+      <button id="startBtn" class="btn">開始測試</button>
+    </div>
+    
+    <!-- 第一題 -->
+    <div id="question1" class="page">
+      <h2>第一個問題</h2>
+      <p>如果可以領到股東會紀念品，你比較喜歡哪個類型呢？</p>
+      <ul class="options">
+        <li><button data-value="1">1. 禮品卡或禮券比較好，有面額的看了比較開心</button></li>
+        <li><button data-value="2">2. 比較喜歡猜不到的，看公司今年有什麼創意</button></li>
+        <li><button data-value="3">3. 我重視健康，覺得清潔用品或是保健食品很不錯</button></li>
+        <li><button data-value="4">4. 什麼股東會紀念品？把公司經營好比較重要啦</button></li>
+      </ul>
+    </div>
+    
+    <!-- 分支題（僅選擇第一題的第二選項時顯示） -->
+    <div id="question2" class="page">
+      <h2>第二個問題</h2>
+      <p>
+        有些公司不發最簡單的禮券，而是絞盡腦汁地挑選每年的股東會紀念品。<br>
+        不過，在這些與眾不同的紀念品中，也可以歸納出一些類型。哪一種你比較有興趣呢？
+      </p>
+      <ul class="options">
+        <li><button data-value="5">5. 有沒有可以吃或喝的紀念品？</button></li>
+        <li><button data-value="6">6. 如果可以拿來裝東西也不錯？</button></li>
+        <li><button data-value="7">7. 我喜歡聯名商品！有這樣的紀念品嗎？</button></li>
+        <li><button data-value="8">8. 我就愛完全猜不到的紀念，有沒有這種的？</button></li>
+      </ul>
+    </div>
+    
+    <!-- 結果頁面 -->
+    <div id="result" class="page">
+      <h2 id="resultTitle"></h2>
+      <div id="resultContent" class="result-content"></div>
+      <button id="restartBtn" class="btn">重新測試</button>
+    </div>
+  `;
+  
+  // 流程控制與進度條設定
+  var currentStep = 0; // 0: 介紹, 1: 第一題, 2: 分支題, 3: 結果
+  var progressBar = container.querySelector('#progress');
+  var pages = {
+    intro: container.querySelector('#intro'),
+    question1: container.querySelector('#question1'),
+    question2: container.querySelector('#question2'),
+    result: container.querySelector('#result')
+  };
+  
+  var startBtn = container.querySelector('#startBtn');
+  var restartBtn = container.querySelector('#restartBtn');
+  var resultTitleEl = container.querySelector('#resultTitle');
+  var resultContentEl = container.querySelector('#resultContent');
+  
+  // 結果資料設定
+  var results = {
+    1: {
+      title: '有面額的看起來比較開心 型',
+      content: '你比較喜歡自己選擇想買什麼商品，所以禮品卡的類型深得你心。事實上，禮品卡也是最多公司選擇發放的紀念品類型，不過面額、適用的地點各有不同。也有公司會發放與自己公司相關的抵用券或是禮券。<br><br>代表公司：大部分的公司、王品（2727）、大魯閣（1432）<br>王品、大魯閣兩家公司，通常會發放與自己公司相關的抵用券。<br>王品2024年就曾發放價值3,000元的「王品股東大禮包」，內含王品門市現金抵用券、王品瘋美食APP、購物網抵用券，以及點數。<br>大魯閣的禮券也常物超所值，2025年便發800元消費抵用券，和8張玩樂買一送一勸，總價值超過4,000元，且零股就能領。'
+    },
+    2: {
+      title: '健康乾淨比較好 型',
+      content: '比起創意、禮券，你更希望股東會紀念品也能讓你健康、乾淨。贈送肥皂、洗衣用品、保健食品、精油、衛生紙的公司也占不小的比例。<br><br>代表公司：佳世達（2352）<br>佳世達雖然贈送的紀念品與健康相關，但在商品品項的選擇上也讓人眼睛一亮。<br>2024年，佳世達贈送「幸福物語蒸氣眼罩(迪士尼系列-米奇)」，2025年，佳世達則選擇「乖乖發財巾88抽」，乖乖從不只從零食變身為濕紙巾，88抽也隱含發財的祝福，可謂別出心裁。'
+    },
+    3: {
+      title: '公司經營才是最重要的 型',
+      content: '你重視公司經營，認為股東會紀念品相對沒這麼重要。事實上，雖然會發配股東會紀念品的公司相當多，但也有完全不發放股東會紀念品的公司呢。<br><br>代表公司：台積電（2330）<br>台積電早年其實有發放股東會紀念品，但近年來已經沒有發放。<br>這些不發放股東會紀念品的公司，有時是因為成本考量、公司文化或政策，也有可能是受法規、公司治理的考量影響。<br>台積電共有逾157萬的股東，要發放股東會紀念品，費用會相當可觀。'
+    },
+    5: {
+      title: '能填飽肚子比較好 型',
+      content: '如果紀念品可以成為熱量就好了！的確，有些紀念品可能用不到，但吃的一定會吃掉。也有公司愛好發放咖啡、米等等的紀念品。<br><br>代表公司：群創（3481）<br>群創2025年發放的股東會紀念品是「台灣產製真空包裝白米1公斤」，有趣的是，另一家面板廠友達，也在今年發放白米當作紀念品，送的是「台灣產製真空包裝白米600公克」。'
+    },
+    6: {
+      title: '給我一個容器 我可以裝下全世界 型',
+      content: '以重視實用性而言，也有許多公司選擇發放杯子、碗、提袋做為股東會紀念品。發「容器」作為紀念品的公司，也都會在這些容器上費盡巧思，有些使用環保材質、有些有亮眼的外型。<br><br>代表公司：中碳（1723）<br>中碳2025年股東會預計發放的紀念品，是「康寧耐熱玻璃烤盤」，外型典雅穩重，而且是美國康寧出品，讓投資人感受到滿滿的用心。'
+    },
+    7: {
+      title: '就愛聯名商品 型',
+      content: '在眾多公司中，也有選擇透過聯名，讓自家股東會紀念品成為焦點的類型。對聯名的IP情有獨鍾的股東們，在紀念品公布時，肯定也異常興奮。<br><br>代表公司：聯電（2303）<br>聯電股東會紀念品，近年來走「療癒風」，選擇與著名IP「咖波」合作，2024年推出「咖波永續隨行杯」，2025年再合作，推「UMCx咖波聯名限定鋼珠筆套組」。'
+    },
+    8: {
+      title: '給我更多創意 型',
+      content: '也有公司致力於讓股東猜紀念品猜破頭，但總是能出乎股東意料，端出最有創意的紀念品。<br><br>代表公司：中鋼（2002）、宏達電（2498）<br>中鋼可以說是眾多公司中，股東會紀念品出了名有創意的，而且還喜歡在紀念品命名上大玩「諧音梗」。2021年，中鋼推出「熊愛台灣棘輪起子工具組」，在台灣黑熊的造型裡，藏著各式工具金屬件。<br>2024年，也推出「砧心有您」抗菌多功能不鏽鋼砧板組，採兩層可拆卸式設計。這些紀念品的金屬件也都出自中鋼之手，可以說既打品牌又能獲得股東的心。<br>宏達電在紀念品上也十分用心，除了2014年令人震撼地送出「HTC One 32G」手機，也送過背包、風衣外套，2024年也送出「HTC雙面抗UV機能帽PLUS乙頂」，又時尚又實用。'
+    }
+  };
+  
+  // 更新進度條 (總共4個階段：0～3)
+  function updateProgress(step) {
+    var percent = (step / 3) * 100;
+    progressBar.style.width = percent + '%';
+  }
+  
+  // 顯示指定頁面，隱藏其他頁面
+  function showPage(pageName) {
+    for (var key in pages) {
+      if (pages.hasOwnProperty(key)) {
+        pages[key].classList.remove('active');
+      }
+    }
+    pages[pageName].classList.add('active');
+  }
+  
+  // 開始測試
+  startBtn.addEventListener('click', function() {
+    currentStep = 1;
+    updateProgress(currentStep);
+    showPage('question1');
+  });
+  
+  // 處理第一題的選項
+  var q1Buttons = pages.question1.querySelectorAll('button');
+  for (var i = 0; i < q1Buttons.length; i++) {
+    q1Buttons[i].addEventListener('click', function(e) {
+      var value = parseInt(e.target.getAttribute('data-value'), 10);
+      if (value === 1 || value === 3 || value === 4) {
+        // 選擇選項1、3、4則直接進入結果（階段3）
+        currentStep = 3;
         updateProgress(currentStep);
-        showSection(question1El);
-      });
-
-      // 處理第一題選項
-      question1El.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const value = parseInt(e.target.getAttribute('data-value'));
-          if (value === 1 || value === 3 || value === 4) {
-            currentStep = 3;
-            updateProgress(currentStep);
-            showResult(results[value]);
-          } else if (value === 2) {
-            currentStep = 2;
-            updateProgress(currentStep);
-            showSection(question2El);
-          }
-        });
-      });
-
-      // 處理分支題選項
-      question2El.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const value = parseInt(e.target.getAttribute('data-value'));
-          currentStep = 3;
-          updateProgress(currentStep);
-          showResult(results[value]);
-        });
-      });
-
-      // 顯示結果頁面
-      function showResult(result) {
-        resultTitleEl.innerHTML = result.title;
-        resultContentEl.innerHTML = result.content;
-        updateProgress(3);
-        showSection(resultEl);
-      }
-
-      // 重新測試
-      restartBtn.addEventListener('click', () => {
-        currentStep = 0;
+        showResult(results[value]);
+      } else if (value === 2) {
+        // 選擇選項2則進入分支題（階段2）
+        currentStep = 2;
         updateProgress(currentStep);
-        showSection(introEl);
-      });
-    })();
-  </script>
-</div>
+        showPage('question2');
+      }
+    });
+  }
+  
+  // 處理分支題（第二題）的選項
+  var q2Buttons = pages.question2.querySelectorAll('button');
+  for (var j = 0; j < q2Buttons.length; j++) {
+    q2Buttons[j].addEventListener('click', function(e) {
+      var value = parseInt(e.target.getAttribute('data-value'), 10);
+      currentStep = 3;
+      updateProgress(currentStep);
+      showResult(results[value]);
+    });
+  }
+  
+  // 顯示結果頁面
+  function showResult(result) {
+    resultTitleEl.innerHTML = result.title;
+    resultContentEl.innerHTML = result.content;
+    showPage('result');
+  }
+  
+  // 重新測試
+  restartBtn.addEventListener('click', function() {
+    currentStep = 0;
+    updateProgress(currentStep);
+    showPage('intro');
+  });
+  
+  // 初始化進度條
+  updateProgress(currentStep);
+})();
+</script>
 <!-- 嵌入式股東會紀念品小遊戲結束 -->
